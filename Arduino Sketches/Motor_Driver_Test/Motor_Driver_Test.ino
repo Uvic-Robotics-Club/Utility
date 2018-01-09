@@ -1,17 +1,6 @@
 #include <Encoder.h>
 #include <PID_v1.h>
 
-double Input;
-double Setpoint, Output;
-
-int Output1, Output2;
-String inputString = "";
-auto mode = AUTOMATIC;
-
-int MotorNumber = 0;
-
-double Kp = 1, Ki = 1, Kd = 0;
-
 #define Encoder_A 2
 #define Encoder_B 3
 #define PWM_A 5
@@ -19,6 +8,20 @@ double Kp = 1, Ki = 1, Kd = 0;
 #define Addr1 9
 #define Addr2 10
 #define Addr3 11
+
+double Input;
+double Setpoint, Output;
+double Kp = 1, Ki = 1, Kd = 0;
+int Output1, Output2;
+int DisplayTime = 500;
+int MotorNumber = 0;
+String inputString = "";
+auto mode = AUTOMATIC;
+long oldPosition  = 0;
+long newPosition = 0;
+unsigned long thisTime = 0;
+unsigned long lastTime = 0;
+unsigned long printTime = 0;
 
 Encoder myEnc(Encoder_A, Encoder_B);
 PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);
@@ -30,51 +33,30 @@ void setup() {
   pinMode (Addr1, INPUT);
   pinMode (Addr2, INPUT);
   pinMode (Addr3, INPUT);
-  if (!digitalRead(Addr1) & !digitalRead(Addr2) & !digitalRead(Addr3)) {
-    MotorNumber = 1;
-  }
-  if (digitalRead(Addr1) & !digitalRead(Addr2) & !digitalRead(Addr3)) {
-    MotorNumber = 2;
-  }
-  if (!digitalRead(Addr1) & digitalRead(Addr2) & !digitalRead(Addr3)) {
-    MotorNumber = 3;
-  }
-  if (digitalRead(Addr1) & digitalRead(Addr2) & !digitalRead(Addr3)) {
-    MotorNumber = 4;
-  }
-  if (!digitalRead(Addr1) & !digitalRead(Addr2) & digitalRead(Addr3)) {
-    MotorNumber = 5;
-  }
-  if (digitalRead(Addr1) & !digitalRead(Addr2) & digitalRead(Addr3)) {
-    MotorNumber = 6;
-  }
-  if (!digitalRead(Addr1) & digitalRead(Addr2) & digitalRead(Addr3)) {
-    MotorNumber = 7;
-  }
-  if (digitalRead(Addr1) & digitalRead(Addr2) & digitalRead(Addr3)) {
-    MotorNumber = 8;
-  }
 
-
+  // calcualte the motor number from which pins are high
+  MotorNumber = digitalRead(Addr1)*1+digitalRead(Addr2)*2+digitalRead(Addr3)*4 + 1;
+  // make sure the output is limited to what the PWM is setup for
   myPID.SetOutputLimits(-255, 255);
   // turn on the pid
   myPID.SetMode(mode);
 
+  // start the serial and tell the comp what motor this is
   Serial.begin(9600);
   Serial.println("Motor:" + String(MotorNumber));
 }
 
-long oldPosition  = 0;
-long newPosition = 0;
-unsigned long thisTime = 0;
-unsigned long lastTime = 0;
-unsigned long printTime = 0;
+
 void loop() {
+  
   thisTime = millis();
   newPosition = myEnc.read();
   Input = (oldPosition - newPosition); // This will generate the difference in steps over the delay, this will be the velocity
   myPID.Compute();
-
+  
+  //Output1 = Output>0 ? 0 : (int)-Output;
+  //Output2 = Output>0 ? (int)Output : 0;
+  
   if (Output > 0) {
     Output1 = 0;
     Output2 = (int) Output;
@@ -91,8 +73,12 @@ void loop() {
 
   analogWrite(PWM_A, Output1);
   analogWrite(PWM_B, Output2);
-  if (thisTime - printTime > 500) {
-    Serial.println("" + String(Input) + "," + String(Output) + "," + String(Setpoint));
+  if (thisTime - printTime > DisplayTime) {
+    Serial.print(Input);
+    Serial.print(",");
+    Serial.print(Output);
+    Serial.print(",");
+    Serial.println(Setpoint);
     printTime = thisTime;
   }
   oldPosition = newPosition;
@@ -123,6 +109,9 @@ void serialEvent() {
     myPID.SetMode(mode);
     Output1 = 0;
     Output2 = 0;
+  }
+  if (first == 'r') {
+    DisplayTime = inputString.toInt();
   }
 
 
