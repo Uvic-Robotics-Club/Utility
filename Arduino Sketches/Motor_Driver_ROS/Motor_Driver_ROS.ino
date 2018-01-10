@@ -1,7 +1,7 @@
 // Including libries
 #include <ros.h>
 #include <std_msgs/Int32.h>
-#include <std_msgs/Int16MultiArray.h>
+#include <geometry_msgs/Quaternion.h>
 #include <Encoder.h>
 #include <PID_v1.h>
 
@@ -41,10 +41,9 @@ void SetpointCB(const std_msgs::Int32& value) {
 
 
 
-std_msgs::Int16MultiArray output_array;
+geometry_msgs::Quaternion output_array;
 ros::Subscriber<std_msgs::Int32> sub("Setpoint", SetpointCB );
 ros::Publisher Output_Pub("Output", &output_array);
-char dim0_label[] = "Output";
 
 void setup() {
   // Define all of the Pin I/O
@@ -65,8 +64,6 @@ void setup() {
   nh.initNode();
 
   // Took the array setup from https://answers.ros.org/question/10988/use-multiarray-in-rosserial/
-  int actual_data_storage[4];
-  output_array.data = &actual_data_storage;
   nh.advertise(Output_Pub);
   nh.subscribe(sub);
 
@@ -86,10 +83,10 @@ void loop() {
 
   oldPosition = newPosition;
 
-  output_array.data[0] = (int)MotorNumber;
-  output_array.data[1] = (int)Input;
-  output_array.data[2] = (int)Output;
-  output_array.data[3] = (int)Setpoint;
+  output_array.x = (int)MotorNumber;
+  output_array.y = (int)Input;
+  output_array.z = (int)Output;
+  output_array.w = (int)Setpoint;
   Output_Pub.publish( &output_array );
   nh.spinOnce();
   delay(50);
