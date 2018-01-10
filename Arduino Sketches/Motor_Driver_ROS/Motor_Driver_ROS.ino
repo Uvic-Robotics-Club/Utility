@@ -78,8 +78,8 @@ void loop() {
   Input = (oldPosition - newPosition); // This will generate the difference in steps over the delay, this will be the velocity
   myPID.Compute();
 
-  Output1 = Output > 0 ? (0) : (abs(Output) < 0 ? 0 : (int) - Output);
-  Output2 = Output > 0 ? (abs(Output) < 0 ? 0 : (int) Output) : (0);
+  Output1 = Output > 0 ? (0) : (abs(Output) < 50 ? 0 : (int) - Output);
+  Output2 = Output > 0 ? (abs(Output) < 50 ? 0 : (int) Output) : (0);
 
   analogWrite(PWM_A, Output1);
   analogWrite(PWM_B, Output2);
