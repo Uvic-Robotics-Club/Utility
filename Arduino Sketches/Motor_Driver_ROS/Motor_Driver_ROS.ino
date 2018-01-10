@@ -62,8 +62,11 @@ void setup() {
 
   // Initialize the Ros Node
   nh.initNode();
+  String sub_name = "Motor" + String(MotorNumber) + "/Setpoint";
+  String pub_name = "Motor" + String(MotorNumber) + "/Output";
+  ros::Subscriber<std_msgs::Int32> sub(sub_name.c_str(), SetpointCB );
+  ros::Publisher Output_Pub(pub_name.c_str(), &output_array);
 
-  // Took the array setup from https://answers.ros.org/question/10988/use-multiarray-in-rosserial/
   nh.advertise(Output_Pub);
   nh.subscribe(sub);
 
