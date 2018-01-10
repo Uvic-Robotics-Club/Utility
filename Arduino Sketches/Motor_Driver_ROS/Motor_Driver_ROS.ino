@@ -68,12 +68,12 @@ void setup() {
   output_array.layout.dim = (std_msgs::MultiArrayDimension *)
                             malloc(sizeof(std_msgs::MultiArrayDimension) * 2);
   output_array.layout.dim[0].label = dim0_label;
-  output_array.layout.dim[0].size = 4;
-  output_array.layout.dim[0].stride = 1 * 4;
+  output_array.layout.dim[0].size = 8;
+  output_array.layout.dim[0].stride = 1 * 8;
   output_array.layout.data_offset = 0;
-  output_array.data = (int *)malloc(sizeof(int) * 4);
+  output_array.data = (int *)malloc(sizeof(int) * 8);
   output_array.layout.dim_length = 1;
-  output_array.data_length = 4;
+  output_array.data_length = 8;
 
 
 
