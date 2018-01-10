@@ -65,18 +65,8 @@ void setup() {
   nh.initNode();
 
   // Took the array setup from https://answers.ros.org/question/10988/use-multiarray-in-rosserial/
-  output_array.layout.dim = (std_msgs::MultiArrayDimension *)
-                            malloc(sizeof(std_msgs::MultiArrayDimension) * 2);
-  output_array.layout.dim[0].label = dim0_label;
-  output_array.layout.dim[0].size = 8;
-  output_array.layout.dim[0].stride = 1 * 8;
-  output_array.layout.data_offset = 0;
-  output_array.data = (int *)malloc(sizeof(int) * 8);
-  output_array.layout.dim_length = 1;
-  output_array.data_length = 8;
-
-
-
+  int actual_data_storage[4];
+  output_array.data = &actual_data_storage;
   nh.advertise(Output_Pub);
   nh.subscribe(sub);
 
