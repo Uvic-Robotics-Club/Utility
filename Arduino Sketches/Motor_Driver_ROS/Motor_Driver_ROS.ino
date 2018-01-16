@@ -45,6 +45,25 @@ geometry_msgs::Quaternion output_array;
 ros::Subscriber<std_msgs::Int32> sub("Setpoint", SetpointCB );
 ros::Publisher Output_Pub("Output", &output_array);
 
+
+ros::Subscriber<std_msgs::Int32> sub1("Motor1/Setpoint", SetpointCB );
+ros::Publisher Output_Pub1("Motor1/Output", &output_array);
+
+ros::Subscriber<std_msgs::Int32> sub2("Motor2/Setpoint", SetpointCB );
+ros::Publisher Output_Pub2("Motor2/Output", &output_array);
+
+ros::Subscriber<std_msgs::Int32> sub3("Motor3/Setpoint", SetpointCB );
+ros::Publisher Output_Pub3("Motor3/Output", &output_array);
+
+ros::Subscriber<std_msgs::Int32> sub4("Motor4/Setpoint", SetpointCB );
+ros::Publisher Output_Pub4("Motor4/Output", &output_array);
+
+ros::Subscriber<std_msgs::Int32> sub5("Motor5/Setpoint", SetpointCB );
+ros::Publisher Output_Pub5("Motor5/Output", &output_array);
+
+ros::Subscriber<std_msgs::Int32> sub6("Motor6/Setpoint", SetpointCB );
+ros::Publisher Output_Pub6("Motor6/Output", &output_array);
+
 void setup() {
   // Define all of the Pin I/O
   pinMode (PWM_A, OUTPUT);
@@ -62,13 +81,34 @@ void setup() {
 
   // Initialize the Ros Node
   nh.initNode();
-  String sub_name = "Motor" + String(MotorNumber) + "/Setpoint";
-  String pub_name = "Motor" + String(MotorNumber) + "/Output";
-  ros::Subscriber<std_msgs::Int32> sub(sub_name.c_str(), SetpointCB );
-  ros::Publisher Output_Pub(pub_name.c_str(), &output_array);
 
-  nh.advertise(Output_Pub);
-  nh.subscribe(sub);
+  switch (MotorNumber) {
+    case 1:
+      nh.advertise(Output_Pub1);
+      nh.subscribe(sub1);
+      break;
+    case 2:
+      nh.advertise(Output_Pub2);
+      nh.subscribe(sub2);
+      break;
+    case 3:
+      nh.advertise(Output_Pub3);
+      nh.subscribe(sub3);
+      break;
+    case 4:
+      nh.advertise(Output_Pub4);
+      nh.subscribe(sub4);
+      break;
+    case 5:
+      nh.advertise(Output_Pub5);
+      nh.subscribe(sub5);
+      break;
+    case 6:
+      nh.advertise(Output_Pub6);
+      nh.subscribe(sub6);
+      break;
+  };
+
 
 
 }
@@ -90,7 +130,28 @@ void loop() {
   output_array.y = (int)Input;
   output_array.z = (int)Output;
   output_array.w = (int)Setpoint;
-  Output_Pub.publish( &output_array );
+
+  switch (MotorNumber) {
+    case 1:
+      Output_Pub1.publish( &output_array );
+      break;
+    case 2:
+      Output_Pub2.publish( &output_array );
+      break;
+    case 3:
+      Output_Pub3.publish( &output_array );
+      break;
+    case 4:
+      Output_Pub4.publish( &output_array );
+      break;
+    case 5:
+      Output_Pub5.publish( &output_array );
+      break;
+    case 6:
+      Output_Pub6.publish( &output_array );
+      break;
+  };
+
   nh.spinOnce();
   delay(50);
 
